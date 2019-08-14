@@ -41,18 +41,13 @@ class Yireo_Mpi_Model_Resource_Core_Attribute extends Yireo_Mpi_Model_Resource_A
     protected function getAttributeStatistics()
     {
         $attributes = $this->getAttributes();
+        $this->attributeCountAll = $attributes->getSize();
 
-        foreach($attributes as $attribute) {
-            $this->attributeCountAll++;
+        $attributes = $this->getAttributes();
+        $this->attributeCountLayNav = $attributes->addFieldToFilter('is_filterable', 1)->getSize();
 
-            if($attribute->getData('is_filterable') == 1) {
-                $this->attributeCountLayNav++;
-            }
-
-            if($attribute->getData('is_searchable') == 1 && $attribute->getData('is_filterable_in_search') == 1) {
-                $this->attributeCountSearch++;
-            }
-        }
+        $attributes = $this->getAttributes();
+        $this->attributeCountSearch = $attributes->addFieldToFilter('is_searchable', 1)->getSize();
     }
 
     /**
@@ -60,7 +55,7 @@ class Yireo_Mpi_Model_Resource_Core_Attribute extends Yireo_Mpi_Model_Resource_A
      */
     protected function getAttributes()
     {
-        $attributes = Mage::getSingleton('eav/config')->getEntityType(Mage_Catalog_Model_Product::ENTITY)->getAttributeCollection();
+        $attributes = Mage::getModel('eav/config')->getEntityType(Mage_Catalog_Model_Product::ENTITY)->getAttributeCollection();
         return $attributes;
     }
 }

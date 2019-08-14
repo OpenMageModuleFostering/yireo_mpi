@@ -23,6 +23,7 @@ class Yireo_Mpi_Model_Resource
             'test',
         ),
         'all' => array(
+            'attribute_listing',
             'core_attribute',
             'core_cache',
             'core_catalog',
@@ -47,6 +48,7 @@ class Yireo_Mpi_Model_Resource
             'security_admin',
             'security_get',
             'security_shoplift',
+            'security_phpinfo',
             'security_xmlrpc',
             'webserver_advanced',
             'webserver_basics',
@@ -56,8 +58,10 @@ class Yireo_Mpi_Model_Resource
             'database_variable',
         ),
         'poll_short' => array(
+            'database_status',
         ),
         'poll_long' => array(
+            'database_status',
         ),
     );
 
@@ -66,8 +70,25 @@ class Yireo_Mpi_Model_Resource
      */
     public function getResourceModels()
     {
-        // @todo: Add an event to allow for third party extensions to extend this array
-        return $this->resourceModels;
+        $resourceModelGroups = $this->resourceModels;
+
+        foreach ($resourceModelGroups as $resourceModelGroupName => $resourceModelGroup) {
+            foreach($resourceModelGroup as $resourceModel) {
+                if (preg_match('/^([a-z]+)_/', $resourceModel, $match)) {
+                    $newGroup = $match[1];
+                    if (!isset($resourceModelGroups[$newGroup])) {
+                        $resourceModelGroups[$newGroup] = array();
+                    }
+
+                    $resourceModelGroups[$newGroup][] = $resourceModel;
+                }
+            }
+        }
+
+        // Add an event to allow for third party extensions to extend this array
+        Mage::dispatchEvent('mpi_list_resource_models', array('resourceModels' => $resourceModelGroups));
+
+        return $resourceModelGroups;
     }
 
     /**
@@ -107,6 +128,7 @@ class Yireo_Mpi_Model_Resource
             return array();
         }
 
+        //Mage::log('[Yireo_Mpi] '.$modelName);
         $modelMetrics = $model->getData();
 
         if (is_array($modelMetrics) == false) {
@@ -134,7 +156,7 @@ class Yireo_Mpi_Model_Resource
     {
         $data = array();
 
-        foreach ($this->resourceModels as $resourceModelGroupName => $resourceModelGroup) {
+        foreach ($this->getResourceModels() as $resourceModelGroupName => $resourceModelGroup) {
 
             if(!empty($selectGroups) && in_array($resourceModelGroupName, $selectGroups) == false) {
                 continue;

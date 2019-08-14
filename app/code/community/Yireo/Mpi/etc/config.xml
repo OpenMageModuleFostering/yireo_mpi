@@ -13,12 +13,11 @@
 
     <modules>
         <Yireo_Mpi>
-            <version>0.2.1</version>
+            <version>0.2.4</version>
         </Yireo_Mpi>
     </modules>
 
     <global>
-
         <blocks>
             <mpi>
                 <class>Yireo_Mpi_Block</class>
@@ -36,7 +35,6 @@
                 <class>Yireo_Mpi_Model</class>
             </mpi>
         </models>
-
     </global>
 
     <adminhtml>
